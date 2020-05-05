@@ -34,6 +34,13 @@ const getFilePath = function(url) {
   return filePath
 }
 
+const removeIntegrityTagsFromHtmlPages = function(data) {
+  console.log('removeIntegrityTagsFromHtmlPages')
+
+  let result = data.toString().replace(/integrity=".*"/g,'')
+  return result
+}
+
 const server = turbo.createServer(function (req, res) {
   let filePath = getFilePath(req.url)
   let contentType = getContentType(filePath);
@@ -47,9 +54,10 @@ const server = turbo.createServer(function (req, res) {
       res.end(JSON.stringify(err));
       return;
     }
+    let dataClean = (contentType === 'text/html')? removeIntegrityTagsFromHtmlPages(data) : data
     res.statusCode = 200;
     res.setHeader('Content-Type', contentType)
-    res.end(data);
+    res.end(dataClean);
   });
 })
 
