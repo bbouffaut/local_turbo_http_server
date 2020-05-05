@@ -1,0 +1,1 @@
+cmd_Release/obj.target/turbo_net.node := g++ -shared -pthread -rdynamic -m64  -Wl,-soname=turbo_net.node -o Release/obj.target/turbo_net.node -Wl,--start-group Release/obj.target/turbo_net/src/turbo_net.o -Wl,--end-group 
