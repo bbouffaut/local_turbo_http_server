@@ -10,8 +10,12 @@
     "node-gyp-build": "^3.3.0",
     "unordered-set": "^2.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "ponicode": "0.0.1-13"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "ponicode node server.js",
+    "test": "jest --coverage"
   }
 }
