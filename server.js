@@ -1,7 +1,10 @@
 const turbo = require('turbo-http'),
 fs = require('fs'),
 path = require('path'),
-public_files = __dirname + '/public_files'
+util = require('util'),
+public_files = __dirname + '/public_files',
+readfile = util.promisify(fs.readFile)
+
 
 const getContentType = function(filePath) {
   var extname = path.extname(filePath);
@@ -47,48 +50,26 @@ const removeIntegrityTagsFromHtmlPages = function(data) {
   return result
 }
 
-const checkIfFileIsCached = function(filePath, res) {
+async function checkIfFileIsCached(filePath) {
   let cachedFilePath = `${filePath}_cached`
-  let contentType = 'text/html'
 
   //DEBUG
   console.log('checkIfFileIsCached', cachedFilePath)
+  let dataClean = await readfile(cachedFilePath)
 
-  fs.readFile(cachedFilePath, function (err,data) {
-    if (err) {
-      processHtmlFile(filePath, res);
-    } else {
+  return dataClean
 
-      res.statusCode = 200;
-      res.setHeader('Content-Type', contentType)
-      res.end(data)      
-
-    }
-
-  });
 }
 
-const processHtmlFile = function(filePath, res) {
-
-  let contentType = 'text/html'
+async function processHtmlFile(filePath) {
 
   //DEBUG
   console.log('processHtmlFile', filePath)
 
-  fs.readFile(filePath, function (err,data) {
-    if (err) {
-      res.statusCode = 404;
-      res.end(JSON.stringify(err));
-      return;
-    }
-    let dataClean = removeIntegrityTagsFromHtmlPages(data)
-    cacheFile(filePath, dataClean)
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', contentType)
-    res.end(dataClean);
-    
-  });
+  let data = await readfile(filePath)
+  let dataClean = removeIntegrityTagsFromHtmlPages(data)
+  cacheFile(filePath, dataClean)
+  return dataClean
 
 }
 
@@ -107,31 +88,70 @@ const cacheFile = function(cacheFile,data) {
 
 }
 
-const server = turbo.createServer(function (req, res) {
+const handle = (promise) => {
+  return promise
+    .then(data => ([data, undefined]))
+    .catch(error => Promise.resolve([undefined, error]));
+}
+
+async function processRequest(req, res) {
 
   let filePath = getFilePath(req.url)
   let contentType = getContentType(filePath)
 
   if (contentType === 'text/html') {
-    checkIfFileIsCached(filePath, res)
 
-  } else {
+    let [dataClean, err] = await handle(checkIfFileIsCached(filePath))
 
-    fs.readFile(filePath, function (err,data) {
-      if (err) {
+    if (err) {
+
+       //DEBUG
+       console.log('File is not cached => then process it')
+
+       let [ dataClean, err ] = await handle(processHtmlFile(filePath))
+
+       if (err) {
         res.statusCode = 404;
         res.end(JSON.stringify(err));
         return;
-      }
+       } else {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', contentType)
+        res.end(dataClean);
+        return
+       }
+
+    } else {
+
+      //DEBUG
+      console.log('File is cached => sending back')
 
       res.statusCode = 200;
       res.setHeader('Content-Type', contentType)
+      res.end(dataClean);
+      return
+
+    }
+    
+  } else {
+
+    let [ data, err ] = await handle(readfile(filePath))
+
+    if (err) {
+      res.statusCode = 404;
+      res.end(JSON.stringify(err));
+      return;
+    } else {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', contentType)
       res.end(data);
-
-  })
-
+      return
+    }
+   
   }
 
-})
+}
+
+const server = turbo.createServer(processRequest)
 
 server.listen(8080)
