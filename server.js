@@ -29,8 +29,13 @@ const getContentType = function(filePath) {
   return contentType
 }
 
+const getFilePath = function(url) {
+  let filePath = (url.endsWith('/') ) ? `${public_files}/${url}index.html` : public_files + url
+  return filePath
+}
+
 const server = turbo.createServer(function (req, res) {
-  let filePath = (req.url === '/' ) ? `${public_files}/index.html` : public_files + req.url
+  let filePath = getFilePath(req.url)
   let contentType = getContentType(filePath);
 
   //DEBUG
