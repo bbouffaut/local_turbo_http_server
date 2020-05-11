@@ -19,7 +19,9 @@
     "polka": "^0.4.0",
     "rayo": "^0.5.7",
     "standard": "^11.0.0",
-    "tape": "^4.9.0"
+    "tape": "^4.9.0",
+    "ponicode": "*",
+    "jest": "*"
   },
   "scripts": {
     "pretest": "npm run lint",
