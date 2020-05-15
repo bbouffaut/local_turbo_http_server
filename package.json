@@ -4,16 +4,16 @@
   "description": "local http server based on turbo-http",
   "dependencies": {
     "turbo-http": "file:lib/turbo-http",
-    "http-parser-js": "^0.4.11",
+    "http-parser-js": "^0.5.2",
     "turbo-net": "file:lib/turbo-net",
-    "napi-macros": "^1.3.0",
-    "node-gyp-build": "^3.3.0",
-    "unordered-set": "^2.0.0"
+    "napi-macros": "^2.0.0",
+    "node-gyp-build": "^4.2.2",
+    "unordered-set": "^2.0.1"
   },
   "devDependencies": {
     "jest": "^26.0.1",
-    "nodemon": "^2.0.3",
-    "ponicode": "0.0.1-13"
+    "nodemon": "^2.0.4",
+    "ponicode": "0.0.1-14"
   },
   "scripts": {
     "start": "node server.js",
