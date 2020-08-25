@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "description": "local http server based on turbo-http",
   "dependencies": {
-    "turbo-http": "file:lib/turbo-http",
     "http-parser-js": "^0.5.2",
-    "turbo-net": "file:lib/turbo-net",
     "napi-macros": "^2.0.0",
     "node-gyp-build": "^4.2.2",
+    "rewire": "^5.0.0",
+    "turbo-http": "file:lib/turbo-http",
+    "turbo-net": "file:lib/turbo-net",
     "unordered-set": "^2.0.1"
   },
   "devDependencies": {
