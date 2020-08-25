@@ -35,7 +35,9 @@ const getContentType = function(filePath) {
         contentType = 'image/ico';
         break
       default:
-        contentType = '';
+        contentType = "";
+        break
+  
   }
   return contentType
 }
